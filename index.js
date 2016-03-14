@@ -11,7 +11,7 @@ var app = express(); //app is the return of the express function
 //assigns result to req.body
 app.use(bodyParser.json());   //.use means it happens on all http methods
 
-//req.body is parsed into a JSON object
+//req.body is now parsed into a JSON object
 
 
 
@@ -49,6 +49,10 @@ app.delete('/books/:id', function(req, res, next){
     res.send(books);
 });
 
+//how this works:  went into PostMan, provided a url of localhost:3000/books/1  DELETE method
+//nothing in the body
+//because we have /books/1 and our function is looking for /books/:id, req.params will now be { id: 1 }
+//we received back the array with position 1 deleted.  
 
 
 
