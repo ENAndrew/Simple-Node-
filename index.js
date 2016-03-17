@@ -1,7 +1,9 @@
 var express = require('express');
 var bodyParser = require('body-parser');  //parses the body section of http
 
-var books = ['doom', 'grapes of wrath', '1984'];
+var booksCtrl = require('./controllers/books_controller.js');
+
+// ./ references the current folder
 
 var app = express(); //app is the return of the express function
 
@@ -13,18 +15,35 @@ app.use(bodyParser.json());   //.use means it happens on all http methods
 
 //req.body is now parsed into a JSON object
 
+app.use(function(req, res, next){
+    console.log(req.body);
+});
 
+
+//calling next() will go to next registered function
+
+
+
+app.use(function(req, res, next){
+    console.log(req.params);
+});
+
+
+
+
+
+
+
+
+
+
+//The following methods are now referencing an object in books_controller.js
 
 //checks to see if the url path === '/books', runs if matches
-app.get('/books', function(req, res, next){  //this only does its thing on http GET methods
-    res.send(books);
-});
+ //this only does its thing on http GET methods
+app.get('/books', booksCtrl.index); //Does not need to be called, express will call it
 
-app.post('/books', function(req, res, next){
-    // req.body = { "name": "hyperion" } at the moment, coming from PostMan, manually entered in body
-    books.push(req.body.name); //just putting in the name value, not the whole object
-    res.send(books);
-});
+app.post('/books', booksCtrl.build);
 
 //lets assume that from the front end we receive an object that looks like: 
 //{
@@ -32,22 +51,11 @@ app.post('/books', function(req, res, next){
 //    newName: 'dragonbone chair'
 //}
 
-app.put('/books', function(req, res, next){  //this only does it's thing if the incoming method is PUT
-    var newPosition = req.body.position;  // gives 2
-    books[newPosition] = req.body.newName; // gives 'dragonbone chair'
-    res.send(books);
-});
-
-
-
-
+app.put('/books', booksCtrl.update);
 // :id is a variable portion of the URL, so it is looking for /books/anything_goes_here, will pass test (could be :anythingatall)
 //req.params begins as an empty object.  For /books/2' req.params = { id: 2 }
 
-app.delete('/books/:id', function(req, res, next){
-    books.splice(req.params.id, 1);
-    res.send(books);
-});
+app.delete('/books/:id', booksCtrl.destroy);
 
 //how this works:  went into PostMan, provided a url of localhost:3000/books/1  DELETE method
 //nothing in the body
